@@ -1,44 +1,19 @@
-import React, { useState } from 'react';
+// src/App.js
+
+import React from 'react';
+import { connect } from 'react-redux';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import TaskList from './components/TaskList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'jquery/dist/jquery.min.js';
 import './App.css';
+import { changeDate } from '../src/actions/taskActions';
 
-const App = () => {
-  const [tasks, setTasks] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const addTask = (task, date) => {
-    const newTask = { title: task, completed: false, date: date };
-    setTasks([...tasks, newTask]);
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  const deleteTask = (index) => {
-    setTasks(tasks.filter((task, i) => i !== index));
-  };
-
-  const markTaskAsCompleted = (index) => {
-    const updatedTasks = tasks.map((task, i) => {
-      if (i === index) {
-        return { ...task, completed: true };
-      }
-      return task;
-    });
-    setTasks(updatedTasks);
-  };
-
-  const filterTasks = (filter) => {
-    setTasks(tasks.filter((task) => task.date === filter));
-  };
-
-  const sortTasks = (sort) => {
-    setTasks(tasks.sort(sort));
+const App = ({ selectedDate, changeDate }) => {
+  const handleDateChange = date => {
+    changeDate(date);
   };
 
   return (
@@ -51,34 +26,19 @@ const App = () => {
         </div>
         <div className="task-list-container">
           <h2>Task List</h2>
-          <TaskList
-            tasks={tasks}
-            onAddTask={addTask}
-            onDeleteTask={deleteTask}
-            onMarkTaskAsCompleted={markTaskAsCompleted}
-            onFilterTasks={filterTasks}
-            onSortTasks={sortTasks}
-            selectedDate={selectedDate}
-          />
+          <TaskList />
         </div>
       </div>
     </div>
   );
 };
 
-export default App;
+const mapStateToProps = state => ({
+  selectedDate: state.selectedDate,
+});
 
+const mapDispatchToProps = {
+  changeDate,
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default connect(mapStateToProps, mapDispatchToProps)(App);

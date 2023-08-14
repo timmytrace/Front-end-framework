@@ -1,30 +1,48 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-const TaskList = ({ tasks, onAddTask, onDeleteTask, onMarkTaskAsCompleted, onFilterTasks, onSortTasks, selectedDate }) => {
+import {
+  addTask,
+  removeTask,
+  markTaskCompleted,
+  filterTasks,
+  sortTasks,
+} from '../actions/taskActions';
+
+const TaskList = ({
+  tasks,
+  addTask,
+  removeTask,
+  markTaskCompleted,
+  filterTasks,
+  sortTasks,
+  selectedDate,
+}) => {
   const handleAddTask = (e) => {
     e.preventDefault();
     const task = e.target.task.value;
-    onAddTask(task);
+    const taskObject = { title: task, completed: false, date: selectedDate };
+    addTask(taskObject);
     e.target.task.value = '';
   };
 
   const handleDeleteTask = (index) => {
-    onDeleteTask(index);
-  };
-
-  const handleMarkTaskAsCompleted = (index) => {
-    onMarkTaskAsCompleted(index);
-  };
-
-  const handleFilterTasks = (filter) => {
-    onFilterTasks(filter);
-  };
-
-  const handleSortTasks = () => {
-    onSortTasks();
+    removeTask(index);
   };
   const filteredTasks = tasks.filter((task) => task.date === selectedDate);
 
+
+  const handleMarkTaskAsCompleted = (index) => {
+    markTaskCompleted(index);
+  };
+
+  const handleFilterTasks = (filter) => {
+    filterTasks(filter);
+  };
+
+  const handleSortTasks = () => {
+    sortTasks();
+  };
 
   return (
     <div>
@@ -73,15 +91,25 @@ const TaskList = ({ tasks, onAddTask, onDeleteTask, onMarkTaskAsCompleted, onFil
   );
 };
 
-export default TaskList;
+const mapStateToProps = (state) => ({
+  tasks: state.tasks.filter((task) => {
+    if (state.filter === 'today') {
+      return task.date === new Date().toISOString().slice(0, 10);
+    } else if (state.filter === 'completed') {
+      return task.completed;
+    } else {
+      return true;
+    }
+  }),
+  selectedDate: state.selectedDate,
+});
 
+const mapDispatchToProps = {
+  addTask,
+  removeTask,
+  markTaskCompleted,
+  filterTasks,
+  sortTasks,
+};
 
-
-
-
-
-
-
-
-
-
+export default connect(mapStateToProps, mapDispatchToProps)(TaskList);
